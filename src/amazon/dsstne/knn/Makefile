@@ -34,7 +34,7 @@ all: $(LIB_BUILD_DIR)/libdsstne_knn.so
 $(LIB_BUILD_DIR)/libdsstne_knn.so: $(OBJECTS) $(CU_OBJECTS)
 	$(info ========== Creating libdsstne_knn.so ==========)
 	mkdir -p $(BUILD_DIR)/lib
-	$(CC) -shared $(LDFLAGS) $(CU_LIBS) $(OBJECTS) $(CU_OBJECTS) -o $@ $(CU_LOADLIBS)
+	$(CC) -shared -export-dynamic $(LDFLAGS) $(CU_LIBS) $(OBJECTS) $(CU_OBJECTS) -o $@ $(CU_LOADLIBS)
 	$(info ========== Copying amazon/dsstne/knn headers ==========)
 	mkdir -p $(HEADERS_BUILD_DIR)
 	cp $(HEADERS) $(HEADERS_BUILD_DIR)

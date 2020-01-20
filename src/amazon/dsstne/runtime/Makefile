@@ -22,7 +22,7 @@ CU_OBJECTS := $(CU_SOURCES:%.cu=$(CU_OBJS_BUILD_DIR)/%.o)
 
 LIB_DSSTNE :=$(BUILD_DIR)/lib/libdsstne.a
 
-LDFLAGS ?= -fPIC
+LDFLAGS ?= -fPIC -export-dynamic
 #LDFLAGS ?= -fPIC -Wl,--whole-archive $(LIB_DSSTNE) -Wl,--no-whole-archive
 
 LIBS = \

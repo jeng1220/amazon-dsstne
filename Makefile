@@ -9,17 +9,20 @@ export BUILD_DIR ?= $(shell pwd)/build
 
 all: | engine runtime utils tests java
 
-engine:
+engine: nvtx.o
 	cd src/amazon/dsstne/engine && make
 
-utils:
+utils: nvtx.o
 	cd src/amazon/dsstne/utils && make
 
-runtime:
+runtime: nvtx.o
 	cd src/amazon/dsstne/runtime && make
 
 tests:
 	cd tst && make
+
+nvtx.o: src/amazon/dsstne/nvtx.cpp
+	mpiCC -export-dynamic -fPIC -I/usr/local/cuda/include -c -o $(BUILD_DIR)/nvtx.o src/amazon/dsstne/nvtx.cpp
 
 #java: | engine runtime tests
 #	cd java && make

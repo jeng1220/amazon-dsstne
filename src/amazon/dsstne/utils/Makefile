@@ -40,7 +40,7 @@ LIBS = \
 
 LOAD_LIBS = $(CU_LOADLIBS)
 
-LDFLAGS ?= -fPIC -Wl,--whole-archive $(LIB_DSSTNE) -Wl,--no-whole-archive
+LDFLAGS ?= -fPIC -Wl,--whole-archive $(LIB_DSSTNE) -Wl,--no-whole-archive -export-dynamic
 
 EXECUTABLES := \
 	$(BIN_BUILD_DIR)/generateNetCDF \

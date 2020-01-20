@@ -40,7 +40,7 @@ $(LIB_BUILD_DIR)/libdsstne.a: $(OBJECTS) $(CU_OBJECTS)
 $(LIB_BUILD_DIR)/libdsstne_engine.so: $(OBJECTS) $(CU_OBJECTS)
 	$(info ========== Creating libdsstne_engine.so ==========)
 	mkdir -p $(BUILD_DIR)/lib
-	$(CC) -shared $(LDFLAGS) $(CU_LIBS) $(OBJECTS) $(CU_OBJECTS) -o $@ $(CU_LOADLIBS)
+	$(CC) -shared -export-dynamic $(LDFLAGS) $(CU_LIBS) $(OBJECTS) $(CU_OBJECTS) -o $@ $(CU_LOADLIBS)
 
 clean:
 	rm -f *cudafe* *.fatbin.* *.fatbin *.ii *.cubin *cu.cpp *.ptx *.cpp?.* *.hash *.o *.d work.pc*

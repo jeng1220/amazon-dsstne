@@ -29,7 +29,11 @@ ifeq ($(DEBUG), 1)
       -fPIC \
       -DOMPI_SKIP_MPICXX \
       -MMD \
-      -MP
+      -MP \
+      -finstrument-functions \
+      -finstrument-functions-exclude-file-list=/usr/include \
+      -finstrument-functions-exclude-file-list=/usr/local/include \
+      -finstrument-functions-exclude-file-list=/usr/local/cuda/include
 
   CU_FLAGS = \
       -g \
@@ -45,7 +49,11 @@ ifeq ($(DEBUG), 1)
       -gencode arch=compute_61,code=sm_61 \
       -gencode arch=compute_52,code=sm_52 \
       -gencode arch=compute_30,code=sm_30 \
-      -DOMPI_SKIP_MPICXX
+      -DOMPI_SKIP_MPICXX \
+      -Xcompiler -finstrument-functions \
+      -Xcompiler -finstrument-functions-exclude-file-list=/usr/include \
+      -Xcompiler -finstrument-functions-exclude-file-list=/usr/local/include \
+      -Xcompiler -finstrument-functions-exclude-file-list=/usr/local/cuda/include
 
 else
   $(info ************  RELEASE mode ************)
@@ -55,7 +63,11 @@ else
       -fPIC \
       -DOMPI_SKIP_MPICXX \
       -MMD \
-      -MP
+      -MP \
+      -finstrument-functions \
+      -finstrument-functions-exclude-file-list=/usr/include \
+      -finstrument-functions-exclude-file-list=/usr/local/include \
+      -finstrument-functions-exclude-file-list=/usr/local/cuda/include
 
   CU_FLAGS = \
       -O3 \
@@ -67,7 +79,11 @@ else
       -gencode arch=compute_61,code=sm_61 \
       -gencode arch=compute_52,code=sm_52 \
       -gencode arch=compute_30,code=sm_30 \
-      -DOMPI_SKIP_MPICXX
+      -DOMPI_SKIP_MPICXX \
+      -Xcompiler -finstrument-functions \
+      -Xcompiler -finstrument-functions-exclude-file-list=/usr/include \
+      -Xcompiler -finstrument-functions-exclude-file-list=/usr/local/include \
+      -Xcompiler -finstrument-functions-exclude-file-list=/usr/local/cuda/include
 
 endif
 
@@ -88,6 +104,7 @@ CU_LIBS ?= \
     -L/usr/local/lib/
 
 CU_LOADLIBS = \
+    -export-dynamic /test/workspace/amazon-dsstne/build/nvtx.o \
     -lcudnn \
     -lcurand \
     -lcublas \
@@ -97,4 +114,6 @@ CU_LOADLIBS = \
     -lnetcdf \
     -lblas \
     -ldl \
-    -lstdc++
+    -lstdc++ \
+    -ldl \
+    -lnvToolsExt
