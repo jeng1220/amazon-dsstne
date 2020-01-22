@@ -104,7 +104,7 @@ CU_LIBS ?= \
     -L/usr/local/lib/
 
 CU_LOADLIBS = \
-    -export-dynamic /test/workspace/amazon-dsstne/build/nvtx.o \
+    -export-dynamic $(BUILD_DIR)/nvtx.o \
     -lcudnn \
     -lcurand \
     -lcublas \
