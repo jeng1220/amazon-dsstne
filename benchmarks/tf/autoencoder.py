@@ -18,8 +18,8 @@ class FeedForwardNetwork(object):
                 activation=tf.nn.sigmoid):
         with tf.variable_scope("FFN"):
             # Create input/output variables
-            self.x = x = tf.placeholder("float", shape=[None, dim_x])
-            self.y_ = y_ = tf.placeholder("float", shape=[None, dim_y])
+            self.x = x = tf.placeholder(tf.float32, shape=[None, dim_x], name="x")
+            self.y_ = y_ = tf.placeholder(tf.float32, shape=[None, dim_y], name="y")
 
             # Create model: parameterized for k deep FF layers
             Hsize = [dim_x] + [hidden_units]*layers + [dim_y]
@@ -27,31 +27,30 @@ class FeedForwardNetwork(object):
             k = len(Hsize)-1
             Wall = [None] * k 
             ball = [None] * k
-            for (layer, d1) in enumerate(Hsize[:-1]):
-                d2 = Hsize[layer+1]
-                Wall[layer] = tf.Variable(tf.random_normal(shape=[d1,d2],stddev=0.1))
-                ball[layer] = tf.Variable(tf.constant(0.1,shape=[d2]))
             Hact = [None] * (k+1)
             Hact[0] = x
-            for layer in range(k):
-                Hact[layer+1] = activation(tf.matmul(Hact[layer],Wall[layer]) + ball[layer])
+
+            for (layer, d1) in enumerate(Hsize[:-1]):
+                with tf.variable_scope("FC" + str(layer)):
+                    d2 = Hsize[layer+1]
+                    Wall[layer] = tf.Variable(tf.random_normal(shape=[d1,d2],stddev=0.1))
+                    ball[layer] = tf.Variable(tf.constant(0.1,shape=[d2]))
+                    Hact[layer+1] = activation(tf.matmul(Hact[layer],Wall[layer]) + ball[layer])
             # output is the last activation
             self.output = y = Hact[k]
 
             # Loss: numerically stable cross-entropy
-            self.loss = loss = -tf.reduce_mean(y_*tf.log(y) + 
-                    (tf.subtract(1.0,y_)*tf.log(tf.subtract(1.000001,y))))
+            with tf.variable_scope("cross-entropy-loss"):
+                self.loss = loss = -tf.reduce_mean(y_*tf.log(y) + 
+                        (tf.subtract(1.0,y_)*tf.log(tf.subtract(1.000001,y))))
 
             # Optimizer
-            self.lr = tf.Variable(1e-4, trainable=False)
-            #self.train_step = tf.train.MomentumOptimizer(self.lr,momentum=0.9).minimize(loss) 
-            # Momentum gives very poor results in my experience here.
-            #self.train_step = tf.train.AdamOptimizer(self.lr).minimize(loss)
-            self.train_step = tf.train.RMSPropOptimizer(self.lr,decay=0.9).minimize(loss)
-
-            self.avgloss = tf.reduce_mean(loss)
- 
- 
+            with tf.variable_scope("Optimizer"):
+                self.lr = tf.Variable(1e-4, trainable=False)
+                #self.train_step = tf.train.MomentumOptimizer(self.lr,momentum=0.9).minimize(loss) 
+                # Momentum gives very poor results in my experience here.
+                self.train_step = tf.train.AdamOptimizer(self.lr).minimize(loss)
+                #self.train_step = tf.train.RMSPropOptimizer(self.lr,decay=0.9).minimize(loss)
 
 class DataManager(object):
     """Encapsulates low-level data loading.
@@ -99,7 +98,7 @@ class DataManager(object):
         with open(filename,"r") as f:
             for line in f.readlines():
                 words = self.parse_line_into_words(line)
-                row = np.zeros((1,self.width))
+                row = np.zeros((1,self.width), np.int8)
                 for word in words:
                     row = self.set_bit(row,word)
                 W_list.append(row)
@@ -187,6 +186,9 @@ def main(cmd):
                 spd = (i+1) / (time.time() - start_time)
                 print("Iter %d. %giter/s" % (i,spd))
         print ("Done training\n")
+
+    writer = tf.summary.FileWriter("tf_log/", graph = sess.graph)
+    writer.flush()
  
  
 
